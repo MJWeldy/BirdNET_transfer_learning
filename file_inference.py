@@ -3,7 +3,7 @@
 # pyenv local 10.0.0
 # usage using poetry to call python
 # poetry install will install dependencies
-# poetry run python main.py P:\PROJECTS\HJA_BirdNET_transfer\data\test_audio\
+# poetry run python main.py v_0 P:\PROJECTS\HJA_BirdNET_transfer\data\test_audio\
 # This will process a folder of audio files and write images to the figures folder and csvs to data/clean
 
 import argparse
@@ -21,7 +21,7 @@ from BirdNET import analyze
 from BirdNET import model
 from BirdNET import embeddings
 
-from HJA_classifier import classifier
+from classifier import classifier
 
 #utility functions
 def process_wav(wav, classifier_model):
@@ -98,8 +98,8 @@ def main():
         'troglodytes_pacificus_Song_1'  : 17, 
     }
     wavs = glob.glob(f"{input_path}*.wav")
-    classifier_model = classifier.load_model('HJA_classifier/checkpoints/v_0.h5')
-    for i , wav in enumerate(wavs):
+    classifier_model = classifier.load_model(f'classifier/checkpoints/{VERSION_NUMBER}.h5')
+    for wav in wavs:
         out_name = wav.split('\\')[-1].split('.')[0]
         scores = process_wav(wav, classifier_model)
         display_results(wav, scores, class_map, out_name)
@@ -109,7 +109,9 @@ def main():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument('version_number')
     parser.add_argument('input_path')
     args = parser.parse_args()
+    VERSION_NUMBER = args.version_number
     input_path = args.input_path
     main()
