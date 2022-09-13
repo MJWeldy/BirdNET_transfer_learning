@@ -9,17 +9,11 @@ from BirdNET import analyze
 from BirdNET import model
 from BirdNET import embeddings
 
+from classifier import utilities
+
 FG_FOLDER = "foreground/"
 BG_FOLDER = "background/"
 
-def generate_class_map(FG_FOLDER):
-    import os
-    dirnames = os.listdir(FG_FOLDER)
-    dirnames.sort() 
-    class_map = {}
-    for i, dirname in enumerate(dirnames):
-        class_map[dirname] = i
-    return class_map
 
 event_template = {
     'label': ('choose', []),
@@ -85,35 +79,12 @@ def vectorize_labels(labels, class_map):
                 results[i, col] = 1
     return results
 
-class_map = {
-        'catharus_ustulatus_Call_1'     : 0,
-        'catharus_ustulatus_Call_2'     : 1,
-        'catharus_ustulatus_Song_1'     : 2, 
-        'empidonax_difficilis_Call_1'   : 3, 
-        'empidonax_difficilis_Call_2'   : 4,
-        'empidonax_difficilis_Song_1'   : 5,
-        'loxia_curvirostra_Call_1'      : 6, 
-        'loxia_curvirostra_Song_1'      : 7,
-        'poecile_rufescens_Call_1'      : 8, 
-        'poecile_rufescens_Call_2'      : 9,
-        'poecile_rufescens_Call_3'      : 10,
-        'poecile_rufescens_Call_4'      : 11,
-        'setophaga_occidentalis_Call_1' : 12, 
-        'setophaga_occidentalis_Song_1' : 13,
-        'troglodytes_pacificus_Call_1'  : 14, 
-        'troglodytes_pacificus_Call_2'  : 15,
-        'troglodytes_pacificus_Call_3'  : 16,
-        'troglodytes_pacificus_Song_1'  : 17, 
-}
+def reset_metrics():
+    for metric in metrics:
+        metric.reset_state()
+    loss_tracking_metric.reset_state()
 
-label_array = vectorize_labels(labels, class_map)
-cols = range(0, len(class_map.keys()), 1)
-dist = [sum(label_array[:,col]) for col in cols]
-print(dist)
-
-
-
-
+# Tensorflow compiled functions
 @tf.function
 def train_step(inputs, targets):
     with tf.GradientTape() as tape:
@@ -145,14 +116,9 @@ def test_step(inputs, targets):
     logs["test_loss"] = loss_tracking_metric.result()
     return logs
 
-def reset_metrics():
-    for metric in metrics:
-        metric.reset_state()
-    loss_tracking_metric.reset_state()
-
 def main():
 
-    class_map = generate_class_map(FG_FOLDER)
+    class_map = utilities.generate_class_map(FG_FOLDER)
     n_classes = len(class_map.keys())
 
     classifier_model = tf.keras.Sequential([

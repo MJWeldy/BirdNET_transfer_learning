@@ -21,7 +21,7 @@ from BirdNET import analyze
 from BirdNET import model
 from BirdNET import embeddings
 
-from classifier import classifier
+from classifier import utilities
 
 #utility functions
 def process_wav(wav, classifier_model):
@@ -77,28 +77,10 @@ def display_results(wav, scores, class_map, out_name):
     return fig
 
 def main():
-    class_map = {
-        'catharus_ustulatus_Call_1'     : 0,
-        'catharus_ustulatus_Call_2'     : 1,
-        'catharus_ustulatus_Song_1'     : 2, 
-        'empidonax_difficilis_Call_1'   : 3, 
-        'empidonax_difficilis_Call_2'   : 4,
-        'empidonax_difficilis_Song_1'   : 5,
-        'loxia_curvirostra_Call_1'      : 6, 
-        'loxia_curvirostra_Song_1'      : 7,
-        'poecile_rufescens_Call_1'      : 8, 
-        'poecile_rufescens_Call_2'      : 9,
-        'poecile_rufescens_Call_3'      : 10,
-        'poecile_rufescens_Call_4'      : 11,
-        'setophaga_occidentalis_Call_1' : 12, 
-        'setophaga_occidentalis_Song_1' : 13,
-        'troglodytes_pacificus_Call_1'  : 14, 
-        'troglodytes_pacificus_Call_2'  : 15,
-        'troglodytes_pacificus_Call_3'  : 16,
-        'troglodytes_pacificus_Song_1'  : 17, 
-    }
+    class_map = utilities.generate_class_map('data/foreground')
+
     wavs = glob.glob(f"{input_path}*.wav")
-    classifier_model = classifier.load_model(f'classifier/checkpoints/{VERSION_NUMBER}.h5')
+    classifier_model = utilities.load_model(f'classifier/checkpoints/{VERSION_NUMBER}.h5')
     for wav in wavs:
         out_name = wav.split('\\')[-1].split('.')[0]
         scores = process_wav(wav, classifier_model)
