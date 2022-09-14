@@ -20,7 +20,7 @@ To run inference on a folder of wav files use poetry to run 'file_inference.py'
         The arguments are the model version number and the path to the audio data
 
 To train a new classifier
-    populated 'data/foreground' and 'data/background' with audio following the instructions found in the scaper tutorial
+    create a folder at 'data/foreground' and 'data/background' and populate those folders with audio following the instructions found in the scaper tutorial
     https://scaper.readthedocs.io/en/latest/tutorial.html
 
     Then use poetry to run 'train_classifier.py'
